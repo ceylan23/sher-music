@@ -1,0 +1,40 @@
+# Maintainer: Sher
+pkgname=sher-music
+pkgver=1.0.1
+pkgrel=1
+pkgdesc="Sher Music - KuGou Music Desktop Player"
+arch=('x86_64')
+url="https://github.com/ceylan23/sher-music"
+license=('MIT')
+depends=('nodejs' 'electron')
+makedepends=('npm' 'git')
+source=("git+https://github.com/ceylan23/sher-music.git#tag=v${pkgver}")
+sha256sums=('SKIP')
+
+package() {
+  cd "$srcdir/sher-music"
+
+  install -dm755 "$pkgdir/opt/sher-music"
+
+  cp -r app.js index.js server.js package.json \
+        module util public electron \
+        "$pkgdir/opt/sher-music/"
+
+  cd "$pkgdir/opt/sher-music"
+  npm install --omit=dev --no-optional --ignore-scripts 2>/dev/null
+
+  rm -rf node_modules/*/{test,tests,__tests__,*.md,CHANGELOG*,.github,.travis.yml}
+
+  # Desktop entry
+  install -dm755 "$pkgdir/usr/share/applications"
+  cat > "$pkgdir/usr/share/applications/sher-music.desktop" << 'EOF'
+[Desktop Entry]
+Name=Sher Music
+Comment=Sher 音乐播放器
+Exec=electron /opt/sher-music
+Icon=audio-x-generic
+Terminal=false
+Type=Application
+Categories=AudioVideo;Audio;Music;
+EOF
+}

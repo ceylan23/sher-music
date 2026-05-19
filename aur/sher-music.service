@@ -1,0 +1,15 @@
+[Unit]
+Description=Sher Music Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /opt/sher-music/index.js
+WorkingDirectory=/opt/sher-music
+Environment=PORT=3000
+Environment=HOST=127.0.0.1
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
