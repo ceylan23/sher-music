@@ -1,4 +1,4 @@
-name: Build Sher
+name: Build Sher APK
 
 on:
   push:
@@ -6,56 +6,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-desktop:
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux
-          - os: macos-latest
-            platform: mac
-          - os: windows-latest
-            platform: win
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm install
-      - run: npm install --save-dev electron electron-builder
-      - name: Build Desktop
-        run: npx electron-builder --${{ matrix.platform }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sher-${{ matrix.platform }}
-          path: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.AppImage
-            dist/*.deb
-          if-no-files-found: ignore
-
   build-android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
       - uses: gradle/actions/setup-gradle@v3
+
       - name: Generate Gradle Wrapper
         working-directory: android
         run: gradle wrapper --gradle-version 8.5
+
       - name: Build APK
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk sher-v1.0.0.apk 2>/dev/null || true
+
       - uses: actions/upload-artifact@v4
         with:
-          name: sher-android
-          path: android/app/build/outputs/apk/release/*.apk
+          name: sher-apk
+          path: |
+            android/app/build/outputs/apk/release/*.apk
+            sher-v1.0.0.apk
           if-no-files-found: ignore
