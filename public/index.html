@@ -224,6 +224,40 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .pb-btn.play-btn.playing{animation:pulseGlow 2s ease-in-out infinite}
 .pb-btn.loop-active{color:var(--accent)}
 
+/* ===== Volume ===== */
+.pb-volume{display:flex;align-items:center;gap:6px;flex-shrink:0}
+@media(max-width:700px){.pb-volume{display:none}}
+.pb-volume svg{width:18px;height:18px;color:var(--text2);cursor:pointer;flex-shrink:0}
+.pb-volume svg:hover{color:var(--text)}
+.vol-slider{-webkit-appearance:none;appearance:none;width:80px;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.12);outline:none;cursor:pointer}
+.vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:var(--text);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.vol-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;border:none;
+  background:var(--text);cursor:pointer}
+
+/* ===== Quality Selector ===== */
+.pb-quality{position:relative;flex-shrink:0}
+.pb-quality-btn{background:rgba(255,255,255,.06);border:1px solid var(--glass-border);
+  border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--text2);
+  cursor:pointer;transition:all .15s;font-family:var(--font);white-space:nowrap}
+.pb-quality-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pb-quality-btn.q-high{color:var(--accent);border-color:rgba(250,45,72,.3)}
+@media(max-width:500px){.pb-quality{display:none}}
+.q-drop{position:absolute;bottom:calc(100% + 8px);right:0;background:rgba(40,40,40,.95);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border2);border-radius:14px;padding:6px;min-width:140px;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;
+  transform:translateY(4px) scale(.96);transition:all .2s;z-index:300}
+.q-drop.show{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
+.q-option{padding:8px 12px;border-radius:10px;font-size:13px;cursor:pointer;
+  transition:background .15s;color:var(--text2);display:flex;align-items:center;justify-content:space-between}
+.q-option:hover{background:rgba(255,255,255,.06)}
+.q-option.active{color:var(--accent);font-weight:600;background:rgba(250,45,72,.08)}
+.q-option .q-tag{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.06);
+  margin-left:8px;font-weight:600}
+.q-option.active .q-tag{background:rgba(250,45,72,.15)}
+
 /* ===== Bottom Nav ===== */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);
   background:var(--glass);backdrop-filter:var(--blur);
@@ -267,17 +301,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 /* ===== Login Modal ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  z-index:400;opacity:0;pointer-events:none;transition:opacity .3s}
+  z-index:400;opacity:0;pointer-events:none;transition:opacity .3s;
+  display:flex;align-items:center;justify-content:center}
 .modal-overlay.show{opacity:1;pointer-events:auto}
-.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.94);
-  background:rgba(30,30,30,.92);backdrop-filter:blur(50px) saturate(200%);
-  -webkit-backdrop-filter:blur(50px) saturate(200%);border-radius:var(--radius-xl);z-index:401;
+.modal{background:rgba(30,30,30,.95);backdrop-filter:blur(50px) saturate(200%);
+  -webkit-backdrop-filter:blur(50px) saturate(200%);border-radius:20px;z-index:401;
   width:380px;max-width:calc(100vw - 32px);max-height:calc(100vh - 80px);
-  overflow-y:auto;opacity:0;pointer-events:none;
+  overflow-y:auto;transform:scale(.94);opacity:0;pointer-events:none;
   transition:all .35s cubic-bezier(.4,0,.2,1);
   box-shadow:0 24px 80px rgba(0,0,0,.6),inset 0 0 0 .5px rgba(255,255,255,.1);
   border:1px solid rgba(255,255,255,.12)}
-.modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.modal-overlay.show .modal{opacity:1;pointer-events:auto;transform:scale(1)}
 .modal-head{padding:24px 24px 0;display:flex;align-items:center;
   justify-content:space-between}
 .modal-head h2{font-size:20px;font-weight:800;letter-spacing:-.3px}
@@ -552,6 +586,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="pb-title" id="pbTitle">未在播放</div>
     <div class="pb-artist" id="pbArtist"></div>
   </div>
+  <div class="pb-volume">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="toggleMute()" id="volIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+    <input type="range" class="vol-slider" id="volSlider" min="0" max="100" value="80" oninput="setVolume(this.value)">
+  </div>
+  <div class="pb-quality" id="pbQuality">
+    <button class="pb-quality-btn" id="qBtn" onclick="toggleQualityDrop()">320</button>
+    <div class="q-drop" id="qDrop">
+      <div class="q-option" data-q="128" onclick="setQuality('128')">标准<span class="q-tag">128K</span></div>
+      <div class="q-option active" data-q="320" onclick="setQuality('320')">高品质<span class="q-tag">320K</span></div>
+      <div class="q-option" data-q="flac" onclick="setQuality('flac')">无损<span class="q-tag">FLAC</span></div>
+    </div>
+  </div>
   <div class="pb-controls">
     <button class="pb-btn" id="loopBtn" onclick="toggleLoopMode()" title="列表循环">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="loopIcon"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
@@ -592,6 +638,8 @@ let sendCodeTimer = null;
 let deviceDfid = '';
 let loopMode = 0;
 let lastHighlighted = -1;
+let currentQuality = '320';
+let prevVolume = 80;
 
 // ===== Nav =====
 const NAV_ITEMS = [
@@ -809,7 +857,7 @@ function debounceSearch() {
   clearTimeout(searchTimer);
   const q = document.getElementById('searchInput').value.trim();
   if (q.length < 1) return;
-  searchTimer = setTimeout(() => { switchTab('search'); searchSongs(q); }, 500);
+  searchTimer = setTimeout(() => { switchTab('search'); searchSongs(q); }, 300);
 }
 function doSearch() {
   const q = document.getElementById('searchInput').value.trim();
@@ -818,15 +866,6 @@ function doSearch() {
   switchTab('search'); searchSongs(q);
 }
 function searchKeyword(kw) { document.getElementById('searchInput').value = kw; doSearch(); }
-async function searchSongs(q) {
-  const c = document.getElementById('content'); c.innerHTML = '<div class="loading">搜索中</div>';
-  let songs = []; const data = await api('/search?keywords='+encodeURIComponent(q)+'&page=1&pagesize=30');
-  if (data?.lists) { const sg = data.lists.find(l=>l.type==='song'); if(sg?.lists) songs = sg.lists.map(parseSong); }
-  if (!songs.length) { const d2 = await api('/search/complex?keywords='+encodeURIComponent(q)+'&page=1&pagesize=30');
-    if(d2?.lists){const sg=d2.lists.find(l=>l.type==='song');if(sg?.lists)songs=sg.lists.map(parseSong);} }
-  playlist = songs;
-  c.innerHTML = '<button class="back-btn" onclick="switchTab(\'recommend\')">← 返回</button><div class="section"><div class="section-header"><div class="section-title">搜索: '+esc(q)+'</div></div>'+(songs.length?renderSongList(songs):'<div class="empty">未找到结果</div>')+'</div>';
-}
 
 // ===== Song Parsing =====
 function parseSong(s) {
@@ -865,7 +904,7 @@ async function playSong(index) {
   setPlayIcon(true); highlightSong(index);
   if (!song.hash) { document.getElementById('pbTitle').textContent += ' (无hash)'; return; }
   try {
-    const data = await api('/song/url?hash='+song.hash+'&album_id='+(song.albumId||'')+'&quality=320&free_part=1');
+    const data = await api('/song/url?hash='+song.hash+'&album_id='+(song.albumId||'')+'&quality='+currentQuality+'&free_part=1');
     const playUrl = data?.url?.[0]||data?.backupUrl?.[0]||data?.url||'';
     if (playUrl) { audio.src = playUrl; audio.play().catch(e=>console.warn('Play err:',e)); lyricsLoaded = false; loadLyrics(song); }
     else document.getElementById('pbTitle').textContent += ' (无法播放)';
@@ -1037,6 +1076,81 @@ function showToast(msg, type) {
   t.textContent = msg; t.className = 'ios-toast' + (type === 'success' ? ' success' : '');
   requestAnimationFrame(() => { t.classList.add('show'); });
   setTimeout(() => { t.classList.remove('show'); }, 2500);
+}
+
+// ===== Volume =====
+audio.volume = 0.8;
+function setVolume(v) {
+  audio.volume = v / 100;
+  updateVolIcon(v);
+  localStorage.setItem('kg_vol', v);
+}
+function toggleMute() {
+  const slider = document.getElementById('volSlider');
+  if (audio.volume > 0) {
+    prevVolume = slider.value;
+    setVolume(0); slider.value = 0;
+  } else {
+    setVolume(prevVolume || 80); slider.value = prevVolume || 80;
+  }
+}
+function updateVolIcon(v) {
+  const icon = document.getElementById('volIcon');
+  if (v == 0) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+  else if (v < 50) icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
+  else icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>';
+}
+// Restore saved volume
+(function(){ const sv=localStorage.getItem('kg_vol'); if(sv!==null){audio.volume=sv/100;document.getElementById('volSlider').value=sv;updateVolIcon(sv);} })();
+
+// ===== Quality =====
+function toggleQualityDrop() {
+  document.getElementById('qDrop').classList.toggle('show');
+}
+function setQuality(q) {
+  currentQuality = q;
+  localStorage.setItem('kg_quality', q);
+  const btn = document.getElementById('qBtn');
+  const labels = { '128':'128', '320':'320', 'flac':'FLAC' };
+  btn.textContent = labels[q] || q;
+  btn.classList.toggle('q-high', q !== '128');
+  document.querySelectorAll('.q-option').forEach(o => o.classList.toggle('active', o.dataset.q === q));
+  document.getElementById('qDrop').classList.remove('show');
+  // Replay current song with new quality
+  if (currentIndex >= 0) playSong(currentIndex);
+}
+// Restore saved quality
+(function(){ const sq=localStorage.getItem('kg_quality'); if(sq) setQuality(sq); })();
+// Close quality dropdown on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.pb-quality')) document.getElementById('qDrop').classList.remove('show');
+});
+
+// ===== Search Optimized =====
+let searchAbort = null;
+async function searchSongs(q) {
+  if (searchAbort) searchAbort.abort();
+  searchAbort = new AbortController();
+  const c = document.getElementById('content');
+  c.innerHTML = '<div class="loading">搜索中</div>';
+  let songs = [];
+  try {
+    const r = await fetch(API+'/search?keywords='+encodeURIComponent(q)+'&page=1&pagesize=30', { headers: authHeaders(), signal: searchAbort.signal });
+    const data = await r.json();
+    const d = data?.data || data;
+    if (d?.lists) { const sg = d.lists.find(l=>l.type==='song'); if(sg?.lists) songs = sg.lists.map(parseSong); }
+  } catch(e) { if (e.name === 'AbortError') return; }
+  if (!songs.length) {
+    try {
+      const r2 = await fetch(API+'/search/complex?keywords='+encodeURIComponent(q)+'&page=1&pagesize=30', { headers: authHeaders(), signal: searchAbort.signal });
+      const d2 = await r2.json();
+      const dd = d2?.data || d2;
+      if(dd?.lists){const sg=dd.lists.find(l=>l.type==='song');if(sg?.lists)songs=sg.lists.map(parseSong);}
+    } catch(e) { if (e.name === 'AbortError') return; }
+  }
+  searchAbort = null;
+  playlist = songs;
+  c.innerHTML = '<button class="back-btn" onclick="switchTab(\'recommend\')">← 返回</button><div class="section"><div class="section-header"><div class="section-title">搜索: '+esc(q)+'</div></div>'+(songs.length?renderSongList(songs.slice(0,20)):'<div class="empty">未找到结果</div>')+'</div>';
 }
 
 init();
