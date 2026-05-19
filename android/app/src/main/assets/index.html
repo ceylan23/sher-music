@@ -7,122 +7,170 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#000;--bg2:#1c1c1e;--card:#1c1c1e;
-  --red:#fa243c;
-  --t1:#fff;--t2:#8e8e93;--t3:#636366;
+  --bg:#000;--bg2:#181818;--bg3:#282828;
+  --red:#fa243c;--pink:#fc3c44;--purple:#bf5af2;
+  --t1:#fff;--t2:#a1a1a6;--t3:#6e6e73;
   --sep:rgba(255,255,255,.08);
-  --glass:rgba(22,22,23,.85);
-  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','PingFang SC','Helvetica Neue',sans-serif;
-  --player-h:68px;--nav-h:50px;
+  --glass:rgba(22,22,23,.88);
+  --sidebar-w:240px;
+  --player-h:72px;--nav-h:56px;
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','PingFang SC','Helvetica Neue',sans-serif;
+  --font-cn:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--font);background:var(--bg);color:var(--t1);
   -webkit-font-smoothing:antialiased;min-height:100vh;
-  padding-bottom:calc(var(--player-h) + var(--nav-h))}
+  display:flex;overflow-x:hidden}
 
-/* ========== TOP NAV ========== */
-.topnav{position:sticky;top:0;z-index:100;
-  background:var(--glass);backdrop-filter:saturate(180%) blur(20px);
-  -webkit-backdrop-filter:saturate(180%) blur(20px);
-  border-bottom:1px solid var(--sep)}
-.topnav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;
-  padding:0 24px;height:48px;gap:24px}
-.topnav-logo{font-size:20px;font-weight:800;color:var(--red);letter-spacing:-.3px;
-  font-style:italic;flex-shrink:0}
-.topnav-tabs{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;flex:1}
-.topnav-tabs::-webkit-scrollbar{display:none}
-.topnav-tab{padding:6px 14px;font-size:14px;font-weight:500;color:var(--t2);
-  white-space:nowrap;cursor:pointer;border-radius:8px;transition:.15s}
-.topnav-tab:hover{color:var(--t1)}
-.topnav-tab.active{color:var(--t1);font-weight:600;background:rgba(255,255,255,.06)}
-.topnav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.topnav-search{position:relative}
-.topnav-search input{width:180px;height:32px;padding:0 12px 0 30px;border-radius:8px;
+/* ===== SIDEBAR (desktop) ===== */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;height:100vh;
+  position:sticky;top:0;display:flex;flex-direction:column;
+  background:rgba(30,30,30,.6);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);
+  border-right:1px solid var(--sep);padding:16px 0;overflow-y:auto;z-index:50}
+.sidebar-logo{padding:8px 20px 20px;font-size:22px;font-weight:800;
+  color:var(--red);font-style:italic;letter-spacing:-.5px}
+.sidebar-section{margin-bottom:4px}
+.sidebar-label{padding:8px 20px 4px;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.8px;color:var(--t3)}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:7px 20px;
+  font-size:14px;font-weight:500;color:var(--t2);cursor:pointer;
+  transition:color .15s,background .15s;border-radius:6px;margin:0 8px}
+.sidebar-item:hover{color:var(--t1);background:rgba(255,255,255,.05)}
+.sidebar-item.active{color:var(--t1);background:rgba(255,255,255,.08);font-weight:600}
+.sidebar-item svg{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.sidebar-item.active svg{opacity:1}
+.sidebar-search{margin:0 12px 12px;position:relative}
+.sidebar-search input{width:100%;height:34px;padding:0 12px 0 32px;border-radius:8px;
   border:none;background:rgba(255,255,255,.08);color:var(--t1);font-size:13px;
-  font-family:var(--font);outline:none;transition:width .25s}
-.topnav-search input:focus{width:260px;background:rgba(255,255,255,.12)}
-.topnav-search input::placeholder{color:var(--t3)}
-.topnav-search svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);
+  font-family:var(--font);outline:none;transition:background .15s}
+.sidebar-search input:focus{background:rgba(255,255,255,.12)}
+.sidebar-search input::placeholder{color:var(--t3)}
+.sidebar-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);
   width:14px;height:14px;color:var(--t3)}
-.topnav-avatar{width:28px;height:28px;border-radius:50%;
-  background:linear-gradient(135deg,var(--red),#bf5af2);display:none;
-  align-items:center;justify-content:center;color:#fff;font-size:11px;
-  font-weight:700;cursor:pointer}
-.topnav-login{background:none;border:none;cursor:pointer;padding:4px;color:var(--t2);
-  transition:color .15s;display:flex}
-.topnav-login:hover{color:var(--t1)}
-.topnav-login svg{width:20px;height:20px}
-@media(max-width:768px){
-  .topnav-inner{padding:0 16px;gap:12px}
-  .topnav-search input{width:120px}
-  .topnav-search input:focus{width:160px}
-}
+.sidebar-login{display:flex;align-items:center;gap:10px;padding:7px 20px;
+  font-size:14px;color:var(--t2);cursor:pointer;margin:0 8px;border-radius:6px;
+  transition:color .15s,background .15s}
+.sidebar-login:hover{color:var(--t1);background:rgba(255,255,255,.05)}
+.sidebar-login svg{width:18px;height:18px;opacity:.7}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:7px 20px;
+  margin:0 8px;border-radius:6px;cursor:pointer;transition:background .15s}
+.sidebar-user:hover{background:rgba(255,255,255,.05)}
+.sidebar-avatar{width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--red),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:12px;font-weight:700}
+.sidebar-username{font-size:14px;font-weight:600;color:var(--t1)}
+@media(max-width:900px){.sidebar{display:none}}
 
-/* ========== CONTENT ========== */
-.page{max-width:1200px;margin:0 auto;padding:24px 24px 40px}
-@media(max-width:768px){.page{padding:16px 16px 32px}}
+/* ===== MAIN ===== */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;
+  height:100vh;overflow-y:auto;scroll-behavior:smooth;
+  padding-bottom:calc(var(--player-h) + var(--nav-h))}
+@media(min-width:901px){.main{padding-bottom:var(--player-h)}}
 
-/* ========== PAGE TITLE ========== */
-.page-title{font-size:36px;font-weight:800;letter-spacing:-.5px;margin-bottom:24px}
-@media(max-width:768px){.page-title{font-size:28px;margin-bottom:20px}}
+/* ===== TOP BAR ===== */
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;
+  justify-content:space-between;padding:12px 28px;height:52px;
+  background:rgba(0,0,0,.65);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px)}
+.topbar-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-search{position:relative;display:none}
+.topbar-search input{width:160px;height:32px;padding:0 12px 0 30px;border-radius:8px;
+  border:none;background:rgba(255,255,255,.08);color:var(--t1);font-size:13px;
+  font-family:var(--font);outline:none;transition:width .2s}
+.topbar-search input:focus{width:240px}
+.topbar-search input::placeholder{color:var(--t3)}
+.topbar-search svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;color:var(--t3)}
+@media(max-width:900px){.topbar-search{display:block}}
 
-/* ========== SECTION ========== */
-.section{margin-bottom:48px}
-@media(max-width:768px){.section{margin-bottom:36px}}
+/* ===== CONTENT ===== */
+.content{max-width:1200px;margin:0 auto;padding:0 28px 40px;width:100%}
+@media(max-width:900px){.content{padding:0 16px 32px}}
+
+/* ===== PAGE HEADER ===== */
+.page-head{padding:20px 0 28px}
+.page-title{font-size:40px;font-weight:800;letter-spacing:-.8px;line-height:1.1}
+@media(max-width:768px){.page-title{font-size:30px}}
+
+/* ===== SECTION ===== */
+.section{margin-bottom:44px}
 .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
-.section-title{font-size:24px;font-weight:700;letter-spacing:-.3px}
-@media(max-width:768px){.section-title{font-size:20px}}
-.section-link{font-size:14px;color:var(--red);cursor:pointer;font-weight:500;
+.section-title{font-size:22px;font-weight:700;letter-spacing:-.3px}
+@media(max-width:768px){.section-title{font-size:18px}}
+.section-more{font-size:13px;color:var(--red);cursor:pointer;font-weight:600;
   background:none;border:none;padding:4px 0}
-.section-link:hover{opacity:.8}
+.section-more:hover{opacity:.8}
 
-/* ========== HORIZONTAL SCROLL ROW ========== */
-.hrow{display:flex;gap:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+/* ===== EDITORIAL HERO ROW ===== */
+.hero-row{display:flex;gap:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;margin-bottom:28px;scroll-snap-type:x mandatory}
+.hero-row::-webkit-scrollbar{display:none}
+.hero-card{flex-shrink:0;width:280px;height:140px;border-radius:12px;padding:20px;
+  color:#fff;cursor:pointer;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:transform .2s;scroll-snap-align:start}
+.hero-card:active{transform:scale(.97)}
+.hero-card .hc-title{font-size:18px;font-weight:700;line-height:1.2;position:relative;z-index:1}
+.hero-card .hc-sub{font-size:12px;opacity:.75;margin-top:4px;position:relative;z-index:1}
+.hero-card::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(0,0,0,.45) 0%,transparent 60%);pointer-events:none}
+@media(max-width:768px){.hero-card{width:240px;height:120px;padding:16px}}
+
+/* ===== HORIZONTAL SCROLL ===== */
+.hrow{display:flex;gap:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;
   scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
 .hrow::-webkit-scrollbar{display:none}
 @media(max-width:768px){.hrow{gap:14px}}
 
-/* ========== CARD (Apple Music style) ========== */
-.card{flex-shrink:0;width:180px;scroll-snap-align:start;cursor:pointer;
+/* ===== ALBUM CARD (square) ===== */
+.card{flex-shrink:0;width:170px;scroll-snap-align:start;cursor:pointer;
   transition:transform .2s}
 .card:active{transform:scale(.97)}
-@media(max-width:768px){.card{width:150px}}
-.card-art{width:100%;aspect-ratio:1;border-radius:8px;overflow:hidden;
-  background:var(--bg2);position:relative}
+@media(max-width:768px){.card{width:148px}}
+.card-art{width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;
+  background:var(--bg2);position:relative;
+  box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .card-art img{width:100%;height:100%;object-fit:cover;display:block}
-.card-art-placeholder{width:100%;height:100%;display:flex;align-items:center;
-  justify-content:center;font-size:40px;background:linear-gradient(135deg,#1c1c1e,#2c2c2e)}
-.card-name{font-size:14px;font-weight:600;margin-top:8px;
+.card-art-ph{width:100%;height:100%;display:flex;align-items:center;
+  justify-content:center;font-size:36px;background:linear-gradient(135deg,#1a1a1a,#2a2a2a)}
+.card-play{position:absolute;bottom:8px;right:8px;width:36px;height:36px;
+  border-radius:50%;background:rgba(250,36,60,.92);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(4px);transition:all .2s;box-shadow:0 2px 12px rgba(250,36,60,.4)}
+.card-play svg{width:16px;height:16px;color:#fff;margin-left:1px}
+.card:hover .card-play{opacity:1;transform:translateY(0)}
+.card-title{font-size:14px;font-weight:600;margin-top:8px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
 .card-sub{font-size:12px;color:var(--t2);margin-top:2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ========== WIDE CARD (playlists) ========== */
-.wcard{flex-shrink:0;width:320px;scroll-snap-align:start;cursor:pointer;
-  display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;
+/* ===== WIDE CARD (playlist row) ===== */
+.wcard{flex-shrink:0;width:300px;scroll-snap-align:start;cursor:pointer;
+  display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;
   transition:background .15s}
 .wcard:active{background:rgba(255,255,255,.04)}
-@media(max-width:768px){.wcard{width:280px}}
-.wcard-art{width:56px;height:56px;border-radius:8px;overflow:hidden;
-  background:var(--bg2);flex-shrink:0}
+.wcard-art{width:52px;height:52px;border-radius:8px;overflow:hidden;
+  background:var(--bg2);flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .wcard-art img{width:100%;height:100%;object-fit:cover}
 .wcard-info{min-width:0}
-.wcard-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;
+.wcard-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis}
 .wcard-sub{font-size:12px;color:var(--t2);margin-top:2px}
 
-/* ========== SONG LIST ========== */
+/* ===== SONG LIST ===== */
 .song-list{display:flex;flex-direction:column}
-.song-row{display:flex;align-items:center;padding:8px 0;gap:12px;cursor:pointer;
-  border-bottom:1px solid var(--sep);transition:background .1s}
-.song-row:last-child{border-bottom:none}
-.song-row:active{background:rgba(255,255,255,.04)}
+.song-row{display:flex;align-items:center;padding:8px 10px;gap:12px;cursor:pointer;
+  border-radius:8px;transition:background .12s}
+.song-row:hover{background:rgba(255,255,255,.04)}
+.song-row:active{background:rgba(255,255,255,.06)}
 .song-row.playing .song-r-name{color:var(--red)}
-.song-r-num{width:24px;text-align:right;font-size:14px;color:var(--t3);
+.song-row.playing .song-r-num{color:var(--red)}
+.song-r-num{width:28px;text-align:right;font-size:14px;color:var(--t3);
   flex-shrink:0;font-variant-numeric:tabular-nums}
 .song-r-art{width:44px;height:44px;border-radius:6px;background:var(--bg2);
-  flex-shrink:0;overflow:hidden}
+  flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .song-r-art img{width:100%;height:100%;object-fit:cover}
 .song-r-info{flex:1;min-width:0}
 .song-r-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;
@@ -130,62 +178,53 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);
 .song-r-artist{font-size:13px;color:var(--t2);margin-top:1px;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
 .song-r-dur{font-size:13px;color:var(--t3);flex-shrink:0;font-variant-numeric:tabular-nums}
-@media(max-width:768px){.song-r-num{width:20px;font-size:13px}}
+@media(max-width:768px){.song-r-num{width:24px;font-size:13px}}
 
-/* ========== GRAD CARDS ========== */
-.grad-row{display:flex;gap:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;margin-bottom:24px}
-.grad-row::-webkit-scrollbar{display:none}
-.grad-card{flex-shrink:0;width:200px;height:80px;border-radius:10px;padding:14px;
-  color:#fff;cursor:pointer;position:relative;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  transition:transform .2s;scroll-snap-align:start}
-.grad-card:active{transform:scale(.96)}
-.grad-card .gc-t{font-size:15px;font-weight:700}
-.grad-card .gc-s{font-size:11px;opacity:.7;margin-top:2px}
-.grad-card::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 20%,rgba(0,0,0,.4) 100%);pointer-events:none}
+/* ===== CATEGORY GRID ===== */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.cat-card{height:80px;border-radius:10px;padding:14px;cursor:pointer;
+  color:#fff;position:relative;overflow:hidden;display:flex;align-items:flex-end;
+  font-size:15px;font-weight:700;transition:transform .15s}
+.cat-card:active{transform:scale(.97)}
+.cat-card::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(0,0,0,.3) 0%,transparent 60%);pointer-events:none}
+@media(max-width:768px){.cat-grid{grid-template-columns:repeat(2,1fr)}}
 
-/* ========== HOT TAGS ========== */
-.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.tag{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;
-  background:rgba(255,255,255,.06);color:var(--t2);border:1px solid var(--sep);
-  transition:.15s}
-.tag:hover{color:var(--red);border-color:var(--red);background:rgba(250,36,60,.06)}
-
-/* ========== PLAYER BAR ========== */
+/* ===== PLAYER BAR ===== */
 .player{position:fixed;bottom:var(--nav-h);left:0;right:0;
   height:var(--player-h);background:var(--glass);
   backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
   border-top:1px solid var(--sep);z-index:200;display:flex;align-items:center;
   padding:0 16px;gap:12px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
 .player.show{transform:translateY(0)}
-.p-progress{position:absolute;top:-1px;left:0;right:0;height:3px;
-  background:rgba(255,255,255,.08);cursor:pointer}
-.p-fill{height:100%;background:var(--red);width:0;transition:width .25s}
-.p-cover{width:48px;height:48px;border-radius:6px;background:var(--bg2);
-  flex-shrink:0;overflow:hidden;cursor:pointer}
+@media(min-width:901px){.player{bottom:0}}
+.p-progress{position:absolute;top:-2px;left:0;right:0;height:4px;
+  background:rgba(255,255,255,.06);cursor:pointer;z-index:1}
+.p-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--pink));
+  width:0;transition:width .2s;border-radius:0 2px 2px 0}
+.p-cover{width:50px;height:50px;border-radius:8px;background:var(--bg2);
+  flex-shrink:0;overflow:hidden;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3)}
 .p-cover img{width:100%;height:100%;object-fit:cover}
 .p-info{flex:1;min-width:0;cursor:pointer}
 .p-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis}
 .p-artist{font-size:12px;color:var(--t2);margin-top:1px;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
-.p-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.p-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .p-btn{background:none;border:none;cursor:pointer;width:32px;height:32px;
   display:flex;align-items:center;justify-content:center;border-radius:50%;
   color:var(--t2);transition:.15s}
 .p-btn:hover{color:var(--t1);background:rgba(255,255,255,.06)}
 .p-btn svg{width:18px;height:18px}
-.p-play{width:36px;height:36px;background:var(--red);color:#fff;border-radius:50%;
-  box-shadow:0 2px 12px rgba(250,36,60,.3)}
+.p-play{width:38px;height:38px;background:var(--red);color:#fff;border-radius:50%;
+  box-shadow:0 2px 14px rgba(250,36,60,.35)}
 .p-play:hover{background:#e0203a;transform:scale(1.06)}
 .p-play svg{width:18px;height:18px}
-@media(max-width:768px){.p-right{gap:4px}}
+@media(max-width:768px){.p-right{gap:4px}.p-cover{width:44px;height:44px}}
 
 /* Volume */
 .p-vol{display:flex;align-items:center;gap:6px}
-@media(max-width:600px){.p-vol{display:none}}
+@media(max-width:700px){.p-vol{display:none}}
 .p-vol svg{width:16px;height:16px;color:var(--t2);cursor:pointer}
 .p-vol svg:hover{color:var(--t1)}
 .vol{-webkit-appearance:none;appearance:none;width:72px;height:3px;border-radius:2px;
@@ -216,21 +255,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);
 .qo.on{color:var(--red);font-weight:600}
 .qo span{font-size:10px;color:var(--t3);font-weight:600}
 
-/* ========== BOTTOM NAV ========== */
+/* ===== BOTTOM NAV (mobile) ===== */
 .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);
   background:var(--glass);backdrop-filter:saturate(180%) blur(20px);
   -webkit-backdrop-filter:saturate(180%) blur(20px);
   border-top:1px solid var(--sep);display:none;
   align-items:center;justify-content:space-around;z-index:200}
-@media(max-width:768px){.bnav{display:flex}}
+@media(max-width:900px){.bnav{display:flex}}
 .bnav-i{display:flex;flex-direction:column;align-items:center;gap:2px;
-  cursor:pointer;padding:4px 12px;color:var(--t3);transition:.15s}
+  cursor:pointer;padding:4px 14px;color:var(--t3);transition:.15s}
 .bnav-i.active{color:var(--t1)}
 .bnav-i svg{width:22px;height:22px}
-.bnav-i span{font-size:10px;font-weight:500}
+.bnav-i span{font-size:10px;font-weight:600}
 
-/* ========== LOGIN MODAL ========== */
-.mbg{position:fixed;inset:0;background:rgba(0,0,0,.4);
+/* ===== LOGIN MODAL ===== */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.45);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   z-index:400;display:flex;align-items:center;justify-content:center;
   opacity:0;pointer-events:none;transition:opacity .25s}
@@ -276,7 +315,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);
 .qr-st{font-size:13px;color:var(--t2);margin-bottom:6px}
 .qr-tip{font-size:11px;color:var(--t3);line-height:1.5}
 
-/* ========== LYRICS ========== */
+/* ===== LYRICS ===== */
 .lyr-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);z-index:300;opacity:0;pointer-events:none;
   transition:opacity .3s}
@@ -295,56 +334,101 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);
 .lyr-x:hover{color:var(--t1)}
 .lyr-b{flex:1;overflow-y:auto;padding:8px 20px 24px}
 .lyr-line{padding:8px 0;font-size:15px;color:var(--t3);text-align:center;
-  line-height:1.5;transition:all .3s}
+  line-height:1.6;transition:all .3s}
 .lyr-line.on{color:var(--t1);font-size:17px;font-weight:600}
 
-/* ========== LOADING ========== */
-.ld{text-align:center;padding:40px 20px;color:var(--t2);font-size:14px}
+/* ===== LOADING / EMPTY ===== */
+.ld{text-align:center;padding:60px 20px;color:var(--t2);font-size:14px}
 .ld::before{content:'';display:inline-block;width:16px;height:16px;
   border:2px solid var(--t3);border-top-color:var(--red);border-radius:50%;
   animation:sp .6s linear infinite;margin-right:8px;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:40px 20px;color:var(--t3);font-size:14px}
+.empty{text-align:center;padding:60px 20px;color:var(--t3);font-size:14px}
 
-/* ========== BACK ========== */
+/* ===== BACK BUTTON ===== */
 .back{background:none;border:none;color:var(--red);font-size:14px;cursor:pointer;
   padding:4px 0;font-weight:500;margin-bottom:12px}
 
-/* ========== TOAST ========== */
-.toast{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-16px);
+/* ===== TOAST ===== */
+.toast{position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-16px);
   background:rgba(44,44,46,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border-radius:12px;padding:8px 18px;z-index:500;font-size:13px;font-weight:600;
+  border-radius:12px;padding:10px 20px;z-index:500;font-size:13px;font-weight:600;
   color:var(--t1);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);
   box-shadow:0 4px 20px rgba(0,0,0,.4);pointer-events:none}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ========== ANIMATIONS ========== */
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.section{animation:fadeUp .4s ease both}
+/* ===== HOT TAGS ===== */
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.tag{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;
+  background:rgba(255,255,255,.06);color:var(--t2);border:1px solid var(--sep);
+  transition:.15s}
+.tag:hover{color:var(--t1);border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.1)}
 
-/* ========== SCROLLBAR ========== */
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section{animation:fadeUp .4s ease both}
+.section:nth-child(2){animation-delay:.05s}
+.section:nth-child(3){animation-delay:.1s}
+.section:nth-child(4){animation-delay:.15s}
+
+/* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar{width:0;height:0}
 </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
-<header class="topnav">
-  <div class="topnav-inner">
-    <div class="topnav-logo">Sher</div>
-    <div class="topnav-tabs" id="topTabs"></div>
-    <div class="topnav-actions">
-      <div class="topnav-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="搜索" onkeydown="if(event.key==='Enter')doSearch()" oninput="debSearch()">
-      </div>
-      <button class="topnav-login" id="loginBtn" onclick="openLogin()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </button>
-      <div class="topnav-avatar" id="userAv" onclick="go('library')">U</div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">Sher</div>
+  <div class="sidebar-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="搜索" onkeydown="if(event.key==='Enter')doSearch()" oninput="debSearch()">
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-item active" data-t="recommend" onclick="go('recommend')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>首页</span>
+    </div>
+    <div class="sidebar-item" data-t="browse" onclick="go('browse')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>浏览</span>
+    </div>
+    <div class="sidebar-item" data-t="rank" onclick="go('rank')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>排行</span>
+    </div>
+    <div class="sidebar-item" data-t="fm" onclick="go('fm')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+      <span>私人FM</span>
+    </div>
+    <div class="sidebar-item" data-t="library" onclick="go('library')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>资料库</span>
     </div>
   </div>
-</header>
+  <div style="flex:1"></div>
+  <div id="sidebarAuth">
+    <div class="sidebar-login" id="loginBtn" onclick="openLogin()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>登录</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main" id="mainScroll">
+  <!-- TOP BAR (mobile) -->
+  <header class="topbar">
+    <div class="topbar-title" id="topTitle">首页</div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput2" placeholder="搜索" onkeydown="if(event.key==='Enter')doSearch2()" oninput="debSearch2()">
+      </div>
+    </div>
+  </header>
+  <div class="content" id="page"></div>
+</div>
 
 <!-- LOGIN MODAL -->
 <div class="mbg" id="mbg" onclick="closeLogin()">
@@ -378,13 +462,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);
   <div class="lyr-b" id="lyrB"></div>
 </div>
 
-<!-- PAGE -->
-<div class="page" id="page"></div>
-
 <!-- PLAYER -->
 <div class="player" id="player">
   <div class="p-progress" onclick="seekP(event)"><div class="p-fill" id="pFill"></div></div>
-  <div class="p-cover" id="pCov" onclick="openLyr()">♪</div>
+  <div class="p-cover" id="pCov" onclick="openLyr()"><div class="card-art-ph" style="font-size:20px;border-radius:8px">♪</div></div>
   <div class="p-info" onclick="openLyr()">
     <div class="p-title" id="pTitle">未在播放</div>
     <div class="p-artist" id="pArt"></div>
@@ -414,7 +495,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- BOTTOM NAV (mobile) -->
 <nav class="bnav" id="bnav"></nav>
 
 <audio id="aud"></audio>
@@ -426,7 +507,7 @@ let tab='recommend',list=[],idx=-1,lyrics=[],lyrOk=false,loggedIn=false,
 
 const TABS=[
   {id:'recommend',l:'首页',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'},
-  {id:'browse',l:'浏览',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>'},
+  {id:'browse',l:'浏览',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>'},
   {id:'rank',l:'排行',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'},
   {id:'fm',l:'FM',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>'},
   {id:'library',l:'资料库',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'},
@@ -439,15 +520,10 @@ async function apP(p,b){try{const r=await fetch(API+p,{method:'POST',headers:ah(
 
 // ===== Init =====
 function init(){
-  buildTabs();buildBnav();chkLogin();regDev();go('recommend');
+  buildBnav();chkLogin();regDev();go('recommend');
 }
 async function regDev(){dfid=localStorage.getItem('kg_dfid')||'';try{const r=await fetch(API+'/register/dev',{method:'POST',headers:ah()});const d=await r.json();const f=d?.data?.dfid||d?.dfid;if(f){dfid=f;localStorage.setItem('kg_dfid',f)}}catch(e){}}
 
-function buildTabs(){
-  document.getElementById('topTabs').innerHTML=TABS.map(t=>
-    '<div class="topnav-tab'+(t.id===tab?' active':'')+'" data-t="'+t.id+'" onclick="go(\''+t.id+'\')">'+t.l+'</div>'
-  ).join('');
-}
 function buildBnav(){
   document.getElementById('bnav').innerHTML=TABS.map(t=>
     '<div class="bnav-i'+(t.id===tab?' active':'')+'" data-t="'+t.id+'" onclick="go(\''+t.id+'\')">'+t.ic+'<span>'+t.l+'</span></div>'
@@ -455,7 +531,9 @@ function buildBnav(){
 }
 function go(t){
   tab=t;
-  document.querySelectorAll('.topnav-tab,.bnav-i').forEach(e=>e.classList.toggle('active',e.dataset.t===t));
+  const titles={recommend:'首页',browse:'浏览',rank:'排行',fm:'私人FM',library:'资料库'};
+  document.getElementById('topTitle').textContent=titles[t]||'';
+  document.querySelectorAll('.sidebar-item,.bnav-i').forEach(e=>e.classList.toggle('active',e.dataset.t===t));
   loadTab(t);
 }
 async function loadTab(t){
@@ -469,23 +547,27 @@ async function loadTab(t){
     case 'library':await loadLib(p);break;
     default:p.innerHTML='<div class="empty">页面不存在</div>';
   }
+  document.getElementById('mainScroll').scrollTop=0;
 }
 
 // ===== Recommend =====
 async function loadRec(p){
   const [s,h,b]=await Promise.all([ap('/recommend/songs'),ap('/search/hot'),ap('/yueku/banner')]);
-  let html='<div class="page-title">首页</div>';
-  // Quick links
-  html+='<div class="grad-row">'+
-    '<div class="grad-card" style="background:linear-gradient(135deg,#667eea,#764ba2)" onclick="loadDaily()"><div class="gc-t">每日推荐</div><div class="gc-s">根据你的口味生成</div></div>'+
-    '<div class="grad-card" style="background:linear-gradient(135deg,#f093fb,#f5576c)" onclick="go(\'fm\')"><div class="gc-t">私人FM</div><div class="gc-s">懂你的音乐电台</div></div>'+
-    '<div class="grad-card" style="background:linear-gradient(135deg,#4facfe,#00f2fe)" onclick="go(\'rank\')"><div class="gc-t">排行榜</div><div class="gc-s">热门音乐风向标</div></div>'+
-    '<div class="grad-card" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)" onclick="go(\'browse\')"><div class="gc-t">歌单</div><div class="gc-s">发现更多精彩歌单</div></div></div>';
+  let html='';
+
+  // Hero cards
+  html+='<div class="hero-row">'+
+    '<div class="hero-card" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)" onclick="loadDaily()"><div class="hc-title">每日推荐</div><div class="hc-sub">根据你的口味生成</div></div>'+
+    '<div class="hero-card" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%)" onclick="go(\'fm\')"><div class="hc-title">私人FM</div><div class="hc-sub">懂你的音乐电台</div></div>'+
+    '<div class="hero-card" style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%)" onclick="go(\'rank\')"><div class="hc-title">排行榜</div><div class="hc-sub">热门音乐风向标</div></div>'+
+    '<div class="hero-card" style="background:linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%)" onclick="go(\'browse\')"><div class="hc-title">精选歌单</div><div class="hc-sub">发现更多精彩</div></div></div>';
+
   // Hot search
   if(h?.list?.[0]){
     html+='<div class="section"><div class="section-head"><div class="section-title">热搜</div></div><div class="tags">'+
       h.list[0].keywords.slice(0,8).map(k=>'<div class="tag" onclick="searchKW(\''+esc(k.keyword)+'\')">'+esc(k.keyword)+'</div>').join('')+'</div></div>';
   }
+
   // Songs
   const songs=(s?.song_list||[]).map(ps);
   if(songs.length){list=songs;
@@ -496,7 +578,7 @@ async function loadRec(p){
 async function loadDaily(){
   const p=document.getElementById('page');p.innerHTML='<div class="ld">加载中</div>';
   const d=await ap('/recommend/songs');const songs=(d?.song_list||[]).map(ps);list=songs;
-  p.innerHTML='<div class="page-title">每日推荐</div><button class="back" onclick="go(\'recommend\')">← 返回</button>'+rsl(songs);
+  p.innerHTML='<div class="page-head"><div class="page-title">每日推荐</div></div><button class="back" onclick="go(\'recommend\')">← 返回</button>'+rsl(songs);
 }
 
 // ===== Browse =====
@@ -504,18 +586,19 @@ async function loadBrowse(p){
   const d=await ap('/top/playlist?category_id=0&pagesize=20');
   if(!d){p.innerHTML='<div class="empty">加载失败</div>';return}
   const ls=d.special_list||[];
-  p.innerHTML='<div class="page-title">浏览</div><div class="section"><div class="section-head"><div class="section-title">热门歌单</div></div><div class="hrow">'+
+  p.innerHTML='<div class="page-head"><div class="page-title">浏览</div></div><div class="section"><div class="section-head"><div class="section-title">热门歌单</div></div><div class="hrow">'+
     ls.map(s=>{const cv=(s.imgurl||s.flexible_cover||'').replace('{size}','400');
       return '<div class="card" onclick="loadPD(\''+(s.global_collection_id||s.specialid)+'\',\''+esc(s.specialname||s.listname)+'\')">'+
-        '<div class="card-art">'+(cv?'<img src="'+cv+'" loading="lazy" onerror="this.outerHTML=\'<div class=card-art-placeholder>♪</div>\'">':'<div class="card-art-placeholder">♪</div>')+'</div>'+
-        '<div class="card-name">'+esc(s.specialname||s.listname)+'</div><div class="card-sub">'+(s.songcount||0)+'首</div></div>';
+        '<div class="card-art">'+(cv?'<img src="'+cv+'" loading="lazy" onerror="this.outerHTML=\'<div class=card-art-ph>♪</div>\'">':'<div class="card-art-ph">♪</div>')+
+        '<div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8,5 19,12 8,19"/></svg></div></div>'+
+        '<div class="card-title">'+esc(s.specialname||s.listname)+'</div><div class="card-sub">'+(s.songcount||0)+'首</div></div>';
     }).join('')+'</div></div>';
 }
 async function loadPD(id,name){
   const p=document.getElementById('page');p.innerHTML='<div class="ld">加载中</div>';
   const d=await ap('/playlist/track/all?id='+encodeURIComponent(id)+'&page=1&pagesize=100');
   let songs=[];if(d)songs=(d.songs||d.info||[]).map(ps);list=songs;
-  p.innerHTML='<div class="page-title">'+esc(name)+'</div><button class="back" onclick="go(\'browse\')">← 返回</button>'+rsl(songs);
+  p.innerHTML='<div class="page-head"><div class="page-title">'+esc(name)+'</div></div><button class="back" onclick="go(\'browse\')">← 返回</button>'+rsl(songs);
 }
 
 // ===== Rank =====
@@ -524,10 +607,11 @@ async function loadRank(p){
   if(!d?.info){p.innerHTML='<div class="empty">加载失败</div>';return}
   const rs=d.info.map(r=>({id:r.rankid,name:r.rankname,
     img:(r.album_img_9||r.img_9||r.banner_9||'').replace('{size}','400')}));
-  p.innerHTML='<div class="page-title">排行</div><div class="section"><div class="section-head"><div class="section-title">排行榜</div></div><div class="hrow">'+
+  p.innerHTML='<div class="page-head"><div class="page-title">排行</div></div><div class="section"><div class="section-head"><div class="section-title">排行榜</div></div><div class="hrow">'+
     rs.map(r=>'<div class="card" onclick="loadRD(\''+r.id+'\',\''+esc(r.name)+'\')">'+
-      '<div class="card-art">'+(r.img?'<img src="'+r.img+'" loading="lazy" onerror="this.outerHTML=\'<div class=card-art-placeholder>♪</div>\'">':'<div class="card-art-placeholder">♪</div>')+'</div>'+
-      '<div class="card-name">'+esc(r.name)+'</div></div>').join('')+'</div></div>';
+      '<div class="card-art">'+(r.img?'<img src="'+r.img+'" loading="lazy" onerror="this.outerHTML=\'<div class=card-art-ph>♪</div>\'">':'<div class="card-art-ph">♪</div>')+
+      '<div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8,5 19,12 8,19"/></svg></div></div>'+
+      '<div class="card-title">'+esc(r.name)+'</div></div>').join('')+'</div></div>';
 }
 async function loadRD(id,name){
   const p=document.getElementById('page');p.innerHTML='<div class="ld">加载中</div>';
@@ -541,7 +625,7 @@ async function loadRD(id,name){
       albumName:s.album_info?.album_name||'',dur:Math.round((s.audio_info?.duration_320||0)/1000),cover:cv};
   }).filter(s=>s.hash);
   list=songs;
-  p.innerHTML='<div class="page-title">'+esc(name)+'</div><button class="back" onclick="go(\'rank\')">← 返回</button>'+(songs.length?rsl(songs):'<div class="empty">暂无数据</div>');
+  p.innerHTML='<div class="page-head"><div class="page-title">'+esc(name)+'</div></div><button class="back" onclick="go(\'rank\')">← 返回</button>'+(songs.length?rsl(songs):'<div class="empty">暂无数据</div>');
 }
 
 // ===== FM =====
@@ -550,36 +634,45 @@ async function loadFM(p){
   if(d?.songs)songs=d.songs.map(ps);
   if(!songs.length){const r=await ap('/recommend/songs');if(r?.song_list)songs=r.song_list.map(ps);}
   list=songs;
-  p.innerHTML='<div class="page-title">私人FM</div><div class="section"><div class="section-head"><div class="section-title">正在播放</div><button class="section-link" onclick="go(\'fm\')">换一批</button></div>'+
+  p.innerHTML='<div class="page-head"><div class="page-title">私人FM</div></div><div class="section"><div class="section-head"><div class="section-title">正在播放</div><button class="section-more" onclick="go(\'fm\')">换一批</button></div>'+
     (songs.length?rsl(songs):'<div class="empty">暂无歌曲</div>')+'</div>';
 }
 
 // ===== Library =====
 async function loadLib(p){
   if(!loggedIn){
-    p.innerHTML='<div class="page-title">资料库</div><div class="empty" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">♪</div><div style="font-size:16px;font-weight:600;margin-bottom:6px">登录 Sher</div><div style="font-size:13px;color:var(--t2);margin-bottom:16px">同步你的歌单和收藏</div><button class="btn-go" style="width:160px;margin:0 auto;display:block" onclick="openLogin()">立即登录</button></div>';
+    p.innerHTML='<div class="page-head"><div class="page-title">资料库</div></div><div class="empty" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">♫</div><div style="font-size:16px;font-weight:600;margin-bottom:6px">登录 Sher</div><div style="font-size:13px;color:var(--t2);margin-bottom:16px">同步你的歌单和收藏</div><button class="btn-go" style="width:160px;margin:0 auto;display:block" onclick="openLogin()">立即登录</button></div>';
     return;
   }
-  p.innerHTML='<div class="ld">加载中</div>';let html='<div class="page-title">资料库</div>';
+  p.innerHTML='<div class="ld">加载中</div>';let html='<div class="page-head"><div class="page-title">资料库</div></div>';
   const dt=await ap('/user/detail');
-  if(dt)html+='<div class="section" style="display:flex;align-items:center;gap:12px"><div class="topnav-avatar" style="display:flex;width:44px;height:44px;font-size:18px">'+(dt.nick_name||'U')[0]+'</div><div><div style="font-size:16px;font-weight:700">'+esc(dt.nick_name||'用户')+'</div><div style="font-size:12px;color:var(--t2)">'+(dt.fans_count||0)+' 粉丝</div></div></div>';
+  if(dt)html+='<div class="section" style="display:flex;align-items:center;gap:12px"><div class="sidebar-avatar" style="width:44px;height:44px;font-size:18px">'+(dt.nick_name||'U')[0]+'</div><div><div style="font-size:16px;font-weight:700">'+esc(dt.nick_name||'用户')+'</div><div style="font-size:12px;color:var(--t2)">'+(dt.fans_count||0)+' 粉丝</div></div></div>';
   const pl=await ap('/user/playlist?userid='+gu());
   if(pl){const ls=pl.info||pl.list||pl.special_list||[];
     if(ls.length)html+='<div class="section"><div class="section-head"><div class="section-title">歌单</div></div><div class="hrow">'+ls.map(s=>{
       const cv=(s.imgurl||s.flexible_cover||'').replace('{size}','400');
-      return'<div class="card" onclick="loadPD(\''+(s.global_collection_id||s.specialid)+'\',\''+esc(s.specialname||s.listname||'')+'\')"><div class="card-art">'+(cv?'<img src="'+cv+'" loading="lazy">':'<div class="card-art-placeholder">♪</div>')+'</div><div class="card-name">'+esc(s.specialname||s.listname||'')+'</div><div class="card-sub">'+(s.songcount||0)+'首</div></div>';
+      return'<div class="card" onclick="loadPD(\''+(s.global_collection_id||s.specialid)+'\',\''+esc(s.specialname||s.listname||'')+'\')"><div class="card-art">'+(cv?'<img src="'+cv+'" loading="lazy">':'<div class="card-art-ph">♪</div>')+'<div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8,5 19,12 8,19"/></svg></div></div><div class="card-title">'+esc(s.specialname||s.listname||'')+'</div><div class="card-sub">'+(s.songcount||0)+'首</div></div>';
     }).join('')+'</div></div>';}
   const hi=await ap('/user/history');
   if(hi){const raw=hi.songs||hi.info||hi.list||[];const songs=raw.map(i=>ps(i.info||i));
     if(songs.length)html+='<div class="section"><div class="section-head"><div class="section-title">最近播放</div></div>'+rsl(songs.slice(0,15))+'</div>';}
-  html+='<div style="text-align:center;padding:16px"><button class="section-link" onclick="logout()">退出登录</button></div>';
+  html+='<div style="text-align:center;padding:16px"><button class="section-more" onclick="logout()">退出登录</button></div>';
   p.innerHTML=html;
 }
 
 // ===== Search =====
 function debSearch(){clearTimeout(sTimer);const q=document.getElementById('searchInput').value.trim();if(q.length<1)return;sTimer=setTimeout(doSearch,120)}
+function debSearch2(){clearTimeout(sTimer);const q=document.getElementById('searchInput2').value.trim();if(q.length<1)return;sTimer=setTimeout(doSearch2,120)}
 function doSearch(){
   const q=document.getElementById('searchInput').value.trim();if(!q)return;
+  execSearch(q);
+}
+function doSearch2(){
+  const q=document.getElementById('searchInput2').value.trim();if(!q)return;
+  document.getElementById('searchInput').value=q;
+  execSearch(q);
+}
+function execSearch(q){
   clearTimeout(sTimer);if(sAbort)sAbort.abort();sAbort=new AbortController();
   const p=document.getElementById('page');p.innerHTML='<div class="ld">搜索中</div>';
   fetch(API+'/search/complex?keywords='+encodeURIComponent(q)+'&page=1&pagesize=20',{headers:ah(),signal:sAbort.signal})
@@ -588,10 +681,10 @@ function doSearch(){
     if(dd?.lists){const sg=dd.lists.find(l=>l.type==='song');if(sg?.lists)songs=sg.lists.map(ps);}
     if(!songs.length&&dd?.song_list)songs=dd.song_list.map(ps);
     list=songs;
-    p.innerHTML='<div class="page-title">搜索</div><button class="back" onclick="go(\'recommend\')">← 返回</button><div class="section"><div class="section-head"><div class="section-title">'+esc(q)+'</div></div>'+(songs.length?rsl(songs.slice(0,20)):'<div class="empty">未找到结果</div>')+'</div>';
+    p.innerHTML='<div class="page-head"><div class="page-title">搜索</div></div><button class="back" onclick="go(\'recommend\')">← 返回</button><div class="section"><div class="section-head"><div class="section-title">'+esc(q)+'</div></div>'+(songs.length?rsl(songs.slice(0,20)):'<div class="empty">未找到结果</div>')+'</div>';
   }).catch(e=>{if(e.name!=='AbortError')p.innerHTML='<div class="empty">搜索失败</div>'});
 }
-function searchKW(k){document.getElementById('searchInput').value=k;doSearch()}
+function searchKW(k){document.getElementById('searchInput').value=k;execSearch(k)}
 
 // ===== Song Parsing =====
 function ps(s){
@@ -618,7 +711,7 @@ async function play(i){
   const bar=document.getElementById('player');bar.classList.add('show');
   document.getElementById('pTitle').textContent=s.name;
   document.getElementById('pArt').textContent=s.artist;
-  document.getElementById('pCov').innerHTML=s.cover?'<img src="'+s.cover+'">':'♪';
+  document.getElementById('pCov').innerHTML=s.cover?'<img src="'+s.cover+'">':'<div class="card-art-ph" style="font-size:20px;border-radius:8px">♪</div>';
   setPI(true);hl(i);
   if(!s.hash){document.getElementById('pTitle').textContent+=' (无hash)';return}
   try{
@@ -708,8 +801,14 @@ function gu(){return localStorage.getItem('kg_userid')||''}
 function logout(){localStorage.removeItem('kg_token');localStorage.removeItem('kg_userid');loggedIn=false;updLogin();go('library')}
 function chkLogin(){loggedIn=!!(gt()&&gu());updLogin()}
 function updLogin(){
-  document.getElementById('loginBtn').style.display=loggedIn?'none':'';
-  document.getElementById('userAv').style.display=loggedIn?'flex':'none';
+  const btn=document.getElementById('loginBtn');
+  if(btn)btn.style.display=loggedIn?'none':'flex';
+  const auth=document.getElementById('sidebarAuth');
+  if(auth&&loggedIn){
+    auth.innerHTML='<div class="sidebar-user" onclick="go(\'library\')"><div class="sidebar-avatar">'+(gt()[0]||'U').toUpperCase()+'</div><span class="sidebar-username">我的资料库</span></div>';
+  }else if(auth){
+    auth.innerHTML='<div class="sidebar-login" id="loginBtn" onclick="openLogin()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>登录</span></div>';
+  }
 }
 function onLogin(){chkLogin();if(tab==='library')loadTab('library')}
 
