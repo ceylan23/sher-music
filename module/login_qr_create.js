@@ -3,7 +3,8 @@ const qrcode = require('qrcode');
 
 module.exports = (params, useAxios) => {
   return new Promise(async (resolve) => {
-    const url = `https://h5.kugou.com/apps/loginQRCode/html/index.html?qrcode=${params.key}`
+    const appid = params?.type === 'web' ? 1014 : 1001;
+    const url = `https://h5.kugou.com/apps/loginQRCode/html/index.html?appid=${appid}&qrcode=${params.key}`
     return resolve({
       code: 200,
       status: 200,

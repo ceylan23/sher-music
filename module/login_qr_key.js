@@ -1,16 +1,17 @@
-const { srcappid, appid } = require('../util');
+const { srcappid } = require('../util');
 
 // 二维码 key 生成接口
 module.exports = (params, useAxios) => {
+  const qrAppid = params?.type === 'web' ? 1014 : 1001;
   return useAxios({
     baseURL: 'https://login-user.kugou.com',
     url: '/v2/qrcode',
     method: 'GET',
     params: {
-      appid: params?.type === 'web' ? 1014 : 1001,
+      appid: qrAppid,
       type: 1,
       plat: 4,
-      qrcode_txt: `https://h5.kugou.com/apps/loginQRCode/html/index.html?appid=${appid}&`,
+      qrcode_txt: `https://h5.kugou.com/apps/loginQRCode/html/index.html?appid=${qrAppid}&`,
       srcappid,
     },
     encryptType: 'web',

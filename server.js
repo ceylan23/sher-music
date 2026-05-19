@@ -343,14 +343,21 @@ async function consturctServer(moduleDefs) {
         }
       });
 
-      // Step 2: 从 query 中分离出 cookie 参数和其余参数
-      const { cookie, ...params } = req.query;
+      // Step 2: 从 query 和 body 中分离出 cookie 参数和其余参数
+      const { cookie: queryCookie, ...params } = req.query;
+      const { cookie: bodyCookie, ...bodyParams } = req.body || {};
 
       // Step 3: 构建统一的 query 对象
-      //   - cookie: 合并请求 Cookie 和 query 中传入的 cookie 参数
-      //   - params: query 中除 cookie 外的其余参数
-      //   - body: 请求体（POST 数据）
-      const query = Object.assign({}, { cookie: Object.assign({}, req.cookies, cookie) }, params, { body: req.body });
+      //   - cookie: 合并请求 Cookie、query 中的 cookie、body 中的 cookie
+      //   - params: query 中的其余参数 + body 中的其余参数（扁平化合并）
+      //   - body: 请求体（保留原始 body 供部分模块直接使用）
+      const query = Object.assign(
+        {},
+        { cookie: Object.assign({}, req.cookies, queryCookie, bodyCookie) },
+        params,
+        bodyParams,
+        { body: req.body }
+      );
 
       // Step 4: 如果请求携带了 Authorization 头，将其解析为 Cookie 并合并
       // 这样客户端可以通过 Authorization 头传递认证信息，例如: token=xxx;userid=xxx

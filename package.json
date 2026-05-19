@@ -1,10 +1,52 @@
 {
-  "name": "kugoumusicapi",
-  "version": "1.5.1",
-  "description": "",
-  "main": "main.js",
+  "name": "sher",
+  "version": "1.0.0",
+  "description": "Sher Music - KuGou Music Client",
+  "main": "electron/main.js",
   "bin": "./app.js",
   "types": "./interface.d.ts",
+  "build": {
+    "appId": "com.sher.music",
+    "productName": "Sher",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**",
+      "!.github/**",
+      "!*.md"
+    ],
+    "extraResources": [
+      "module/**",
+      "util/**",
+      "server.js",
+      "index.js"
+    ],
+    "mac": {
+      "category": "public.app-category.music",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "public/icon.png"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "public/icon.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "public/icon.png",
+      "category": "Audio"
+    }
+  },
   "pkg": {
     "scripts": "module/*.js",
     "assets": [
@@ -20,28 +62,29 @@
   "scripts": {
     "dev": "nodemon --config nodemon.json index.js",
     "start": "node app.js",
+    "electron": "electron .",
+    "electron:build": "electron-builder --mac --win --linux",
     "pkgwin": "pkg . -t node14-win-x64 -C GZip -o bin/app_win --no-bytecode",
     "pkglinux": "pkg . -t node14-linux-x64 -C GZip -o bin/app_linux --no-bytecode",
     "pkglinux-arm64": "pkg . -t node14-linux-arm64 -C GZip -o bin/app_linux --no-bytecode",
-    "pkgmacos": "pkg . -t node14-macos-x64 -C GZip -o bin/app_macos --no-bytecode",
-    "pkgjs": "esbuild index.js --bundle --minify --outfile=bin/api_js/app.js --platform=node && mkdir -p bin/api_js/util bin/api_js/module && esbuild util/*.js --bundle --minify --outdir=bin/api_js/util --platform=node && esbuild module/*.js --bundle --minify --outdir=bin/api_js/module --platform=node"
+    "pkgmacos": "pkg . -t node14-macos-x64 -C GZip -o bin/app_macos --no-bytecode"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   },
   "keywords": [
     "酷狗音乐",
-    "酷狗",
-    "音乐",
-    "酷狗音乐nodejs"
+    "Sher",
+    "music"
   ],
-  "author": "Lines",
+  "author": "Sher",
   "license": "MIT",
   "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/node": "^18.11.9",
     "@types/pako": "^2.0.0",
     "@types/qrcode": "^1.5.0",
+    "electron": "^42.1.0",
     "nodemon": "^3.1.10",
     "pkg": "^5.8.1",
     "prettier": "^2.7.1",
@@ -53,7 +96,6 @@
     "big-integer": "^1.6.52",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
-    "esbuild": "^0.25.3",
     "express": "^4.18.2",
     "node-forge": "^1.3.3",
     "pako": "^2.1.0",

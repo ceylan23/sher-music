@@ -25,3 +25,11 @@ bin/*
 *.sln
 *.sw?
 .env
+
+# Android
+android/.gradle
+android/build
+android/app/build
+android/local.properties
+*.apk
+*.aab
