@@ -130,6 +130,7 @@ public class EmbeddedServer extends Thread {
             String mid = UUID.randomUUID().toString().replace("-","");
             String dfid = cookies.getOrDefault("dfid",
                 UUID.randomUUID().toString().replace("-","") + "-" + System.currentTimeMillis());
+            String clienttime = String.valueOf(System.currentTimeMillis()/1000);
 
             // standard params
             p.put("dfid", dfid);
@@ -137,100 +138,190 @@ public class EmbeddedServer extends Thread {
             p.put("uuid", "-");
             p.put("appid", APP_ID);
             p.put("clientver", CLIENT_VER);
-            p.put("clienttime", String.valueOf(System.currentTimeMillis()/1000));
+            p.put("clienttime", clienttime);
             p.put("srcappid", SRC_APP_ID);
             if (cookies.containsKey("token"))  p.put("token", cookies.get("token"));
             if (cookies.containsKey("userid")) p.put("userid", cookies.get("userid"));
 
-            String base, api, encType = "android";
+            String base, method = "GET", encType = "android", xrouter = null;
             String postData = body.length > 0 ? new String(body, "UTF-8") : "";
 
+            // ---- route mapping ----
+
             if (path.contains("/search/complex")) {
-                base = "https://complexsearch.kugou.com";
-                api = "/v6/search/complex";
+                base = "https://complexsearch.kugou.com"; path = "/v6/search/complex";
                 p.put("platform","AndroidFilter");
                 move(p,"keywords","keyword");
                 dflt(p,"page","1"); dflt(p,"pagesize","30"); dflt(p,"cursor","0");
 
+            } else if (path.contains("/search/hot")) {
+                base = "https://gateway.kugou.com"; path = "/api/v3/search/hot_tab";
+                p.put("navid","1"); p.put("plat","2");
+                xrouter = "msearch.kugou.com";
+
             } else if (path.contains("/search/lyric")) {
-                base = "https://gateway.kugou.com";
-                api = "/v1/search/lyric";
+                base = "https://gateway.kugou.com"; path = "/v1/search/lyric";
                 p.put("platform","AndroidFilter");
                 move(p,"keywords","keyword");
                 dflt(p,"page","1"); dflt(p,"pagesize","5");
 
             } else if (path.contains("/search/")) {
-                base = "https://gateway.kugou.com";
-                api = "/v3/search/song";
+                base = "https://gateway.kugou.com"; path = "/v3/search/song";
                 p.put("platform","AndroidFilter");
                 move(p,"keywords","keyword");
                 dflt(p,"page","1"); dflt(p,"pagesize","30");
                 p.put("iscorrection","1"); p.put("albumhide","0"); p.put("nocollect","0");
 
+            } else if (path.contains("/recommend/songs")) {
+                base = "https://gateway.kugou.com"; path = "/everyday_song_recommend";
+                method = "POST"; xrouter = "everydayrec.service.kugou.com";
+                p.put("platform","android");
+                dflt(p,"userid","0");
+                postData = "platform=android&userid=" + p.get("userid");
+
+            } else if (path.contains("/personal/fm")) {
+                base = "https://gateway.kugou.com"; path = "/v2/personal_recommend";
+                method = "POST"; xrouter = "persnfm.service.kugou.com";
+                String ts = String.valueOf(System.currentTimeMillis());
+                p.put("key", signParamsKey(ts));
+                p.put("action","play"); p.put("recommend_source_locked","0");
+                p.put("song_pool_id","0"); p.put("callerid","0"); p.put("m_type","1");
+                p.put("platform","android"); p.put("area_code","1");
+                p.put("remain_song_cnt","0"); p.put("mode","normal");
+                postData = "action=play&platform=android&mode=normal";
+
+            } else if (path.contains("/yueku/banner")) {
+                base = "https://gateway.kugou.com"; path = "/ads.gateway/v3/listen_banner";
+                method = "POST";
+                p.put("plat","0"); p.put("channel","201"); p.put("operator","7");
+                p.put("apiver","5"); p.put("mode","normal");
+                postData = "plat=0&channel=201&operator=7&apiver=5&mode=normal";
+
+            } else if (path.contains("/top/playlist")) {
+                base = "https://gateway.kugou.com"; path = "/v2/special_recommend";
+                method = "POST"; xrouter = "specialrec.service.kugou.com";
+                String catId = p.getOrDefault("category_id","0");
+                p.put("key", signParamsKey(clienttime));
+                p.put("req_multi","1");
+                p.remove("category_id");
+                postData = "categoryid=" + catId + "&page=" + p.getOrDefault("page","1")
+                    + "&pagesize=" + p.getOrDefault("pagesize","20")
+                    + "&appid=" + APP_ID + "&clientver=" + CLIENT_VER + "&req_multi=1";
+
+            } else if (path.contains("/playlist/track/all")) {
+                base = "https://gateway.kugou.com"; path = "/pubsongs/v2/get_other_list_file_nofilt";
+                String id = p.getOrDefault("id","");
+                int page = Integer.parseInt(p.getOrDefault("page","1"));
+                int ps = Integer.parseInt(p.getOrDefault("pagesize","100"));
+                p.clear(); p.put("dfid",dfid); p.put("mid",mid); p.put("uuid","-");
+                p.put("appid",APP_ID); p.put("clientver",CLIENT_VER);
+                p.put("clienttime",clienttime); p.put("srcappid",SRC_APP_ID);
+                p.put("global_collection_id",id);
+                p.put("area_code","1"); p.put("mode","1");
+                p.put("pagesize",String.valueOf(ps));
+                p.put("begin_idx",String.valueOf((page-1)*ps));
+                p.put("extend_fields","abtags,hot_cmt,popularization");
+
+            } else if (path.contains("/rank/list")) {
+                base = "https://gateway.kugou.com"; path = "/ocean/v6/rank/list";
+                p.put("plat","2"); dflt(p,"withsong","1"); dflt(p,"parentid","0");
+
+            } else if (path.contains("/rank/audio")) {
+                base = "https://gateway.kugou.com"; path = "/openapi/kmr/v2/rank/audio";
+                method = "POST";
+                move(p,"rankid","rank_id");
+                dflt(p,"rank_cid","0");
+                p.put("area_code","1"); p.put("show_portrait_mv","1"); p.put("type","1");
+                postData = "rank_id=" + p.getOrDefault("rank_id","")
+                    + "&area_code=1&page=" + p.getOrDefault("page","1")
+                    + "&pagesize=" + p.getOrDefault("pagesize","50");
+
+            } else if (path.contains("/user/detail")) {
+                base = "https://gateway.kugou.com"; path = "/v3/get_my_info";
+                method = "POST"; xrouter = "usercenter.kugou.com";
+                p.put("usertype","1");
+                postData = "usertype=1";
+
+            } else if (path.contains("/user/playlist")) {
+                base = "https://gateway.kugou.com"; path = "/v7/get_all_list";
+                method = "POST"; xrouter = "cloudlist.service.kugou.com";
+                p.put("type","2"); p.put("total_ver","979");
+                dflt(p,"page","1"); dflt(p,"pagesize","30");
+                postData = "userid=" + p.getOrDefault("userid","0")
+                    + "&type=2&page=" + p.getOrDefault("page","1")
+                    + "&pagesize=" + p.getOrDefault("pagesize","30");
+
+            } else if (path.contains("/user/history")) {
+                base = "https://gateway.kugou.com"; path = "/playhistory/v1/get_songs";
+                method = "POST";
+                p.put("source_classify","app"); p.put("to_subdivide_sr","1");
+                postData = "source_classify=app&to_subdivide_sr=1";
+
             } else if (path.contains("/song/url")) {
-                base = "https://gateway.kugou.com";
-                api = "/v5/url";
+                base = "https://gateway.kugou.com"; path = "/v5/url";
+                xrouter = "trackercdn.kugou.com";
                 String hash = p.getOrDefault("hash","");
                 String albumId = p.getOrDefault("album_id","");
-                p.clear();
-                p.put("appid",APP_ID); p.put("clientver",CLIENT_VER);
+                String quality = p.getOrDefault("quality","");
+                p.clear(); p.put("appid",APP_ID); p.put("clientver",CLIENT_VER);
                 p.put("dfid",dfid); p.put("mid",mid); p.put("uuid","-");
-                p.put("clienttime",String.valueOf(System.currentTimeMillis()/1000));
+                p.put("clienttime",clienttime);
                 p.put("key", md5(hash + SIGN_KEY_SALT + APP_ID + mid + "0"));
                 p.put("pid","2"); p.put("behavior","play");
                 p.put("area_code","1"); p.put("hash",hash);
                 p.put("album_id",albumId); p.put("module","");
                 p.put("openbear","1"); p.put("cmd","26"); p.put("version","1070");
+                if (!quality.isEmpty()) p.put("quality", quality);
+
+            } else if (path.contains("/lyric")) {
+                base = "https://lyrics.kugou.com"; path = "/download";
+                dflt(p,"ver","1"); dflt(p,"client","android"); dflt(p,"fmt","krc");
+                dflt(p,"charset","utf8");
 
             } else if (path.contains("/login/qr/key")) {
-                base = "https://login-user.kugou.com";
-                api = "/v2/get_qrcode";
+                base = "https://login-user.kugou.com"; path = "/v2/get_qrcode";
                 p.clear(); p.put("appid","1005"); p.put("srcappid",SRC_APP_ID); p.put("plat","4");
                 encType = "web";
 
             } else if (path.contains("/login/qr/create")) {
-                base = "https://login-user.kugou.com";
-                api = "/v2/create_qrcode";
+                base = "https://login-user.kugou.com"; path = "/v2/create_qrcode";
                 String key = p.getOrDefault("key","");
                 p.clear(); p.put("appid","1005"); p.put("srcappid",SRC_APP_ID);
                 p.put("key",key); p.put("qrimg","true");
                 encType = "web";
 
             } else if (path.contains("/login/qr/check")) {
-                base = "https://login-user.kugou.com";
-                api = "/v2/get_userinfo_qrcode";
+                base = "https://login-user.kugou.com"; path = "/v2/get_userinfo_qrcode";
                 String key = p.getOrDefault("key","");
                 p.clear(); p.put("appid","1005"); p.put("srcappid",SRC_APP_ID);
                 p.put("plat","4"); p.put("qrcode",key);
                 encType = "web";
 
             } else if (path.contains("/register/dev")) {
-                base = "https://gateway.kugou.com";
-                api = "/v5/register_dev";
+                base = "https://gateway.kugou.com"; path = "/v5/register_dev";
                 p.put("platform","android");
                 encType = "register";
 
-            } else if (path.contains("/lyric")) {
-                base = "https://gateway.kugou.com";
-                api = path;
-                // pass through
-
-            } else if (path.contains("/recommend/songs")) {
-                base = "https://gateway.kugou.com";
-                api = "/v2/get_recommend";
-
             } else {
                 base = "https://gateway.kugou.com";
-                api = path;
+                // fallback: keep path as-is
             }
 
+            // sign
             String sig = sign(p, encType, postData);
-            StringBuilder url = new StringBuilder(base).append(api).append("?");
+
+            // build URL
+            StringBuilder url = new StringBuilder(base).append(path).append("?");
             for (Map.Entry<String,String> e : p.entrySet())
                 url.append(enc(e.getKey())).append("=").append(enc(e.getValue())).append("&");
             url.append("signature=").append(sig);
 
-            String resp = httpGet(url.toString(), dfid, mid);
+            String resp;
+            if ("POST".equals(method)) {
+                resp = httpPost(url.toString(), postData, dfid, mid, clienttime, xrouter);
+            } else {
+                resp = httpGet(url.toString(), dfid, mid, clienttime, xrouter);
+            }
             write(out, 200, "application/json", resp);
         } catch (Exception e) {
             Log.e(TAG, "routeApi: " + e.getMessage(), e);
@@ -272,9 +363,13 @@ public class EmbeddedServer extends Thread {
         } catch (Exception e) { return ""; }
     }
 
+    private static String signParamsKey(String data) {
+        return md5(APP_ID + ANDROID_SALT + CLIENT_VER + data);
+    }
+
     /* ---- HTTP ---- */
 
-    private String httpGet(String urlStr, String dfid, String mid) {
+    private String httpGet(String urlStr, String dfid, String mid, String clienttime, String xrouter) {
         try {
             HttpURLConnection c = (HttpURLConnection) new URL(urlStr).openConnection();
             c.setRequestMethod("GET");
@@ -283,11 +378,43 @@ public class EmbeddedServer extends Thread {
             c.setRequestProperty("User-Agent", UA);
             c.setRequestProperty("dfid", dfid);
             c.setRequestProperty("mid", mid);
-            c.setRequestProperty("clienttime", String.valueOf(System.currentTimeMillis()/1000));
+            c.setRequestProperty("clienttime", clienttime);
+            c.setRequestProperty("kg-rc", "1");
+            c.setRequestProperty("kg-rec", "1");
+            if (xrouter != null) c.setRequestProperty("x-router", xrouter);
             InputStream is = c.getResponseCode() >= 400 ? c.getErrorStream() : c.getInputStream();
             return slurp(is);
         } catch (Exception e) {
             Log.e(TAG, "httpGet: " + e.getMessage());
+            return "{\"status\":0,\"error\":\""+e.getMessage()+"\"}";
+        }
+    }
+
+    private String httpPost(String urlStr, String postData, String dfid, String mid,
+                            String clienttime, String xrouter) {
+        try {
+            HttpURLConnection c = (HttpURLConnection) new URL(urlStr).openConnection();
+            c.setRequestMethod("POST");
+            c.setConnectTimeout(12000);
+            c.setReadTimeout(12000);
+            c.setDoOutput(true);
+            c.setRequestProperty("User-Agent", UA);
+            c.setRequestProperty("dfid", dfid);
+            c.setRequestProperty("mid", mid);
+            c.setRequestProperty("clienttime", clienttime);
+            c.setRequestProperty("kg-rc", "1");
+            c.setRequestProperty("kg-rec", "1");
+            c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            if (xrouter != null) c.setRequestProperty("x-router", xrouter);
+            if (postData != null && !postData.isEmpty()) {
+                OutputStream os = c.getOutputStream();
+                os.write(postData.getBytes("UTF-8"));
+                os.flush(); os.close();
+            }
+            InputStream is = c.getResponseCode() >= 400 ? c.getErrorStream() : c.getInputStream();
+            return slurp(is);
+        } catch (Exception e) {
+            Log.e(TAG, "httpPost: " + e.getMessage());
             return "{\"status\":0,\"error\":\""+e.getMessage()+"\"}";
         }
     }
