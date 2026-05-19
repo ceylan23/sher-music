@@ -423,6 +423,12 @@ async function consturctServer(moduleDefs) {
         // 异常处理：模块内部错误会被封装为包含 status 和 body 的错误对象抛出
         const moduleResponse = e;
 
+        // 如果 rejected 的 body 包含有效数据（如 KuGou 返回 status:0 但有结果），当作成功返回
+        if (moduleResponse.body && (moduleResponse.body.lists || moduleResponse.body.data || moduleResponse.body.info || moduleResponse.body.song_list || moduleResponse.body.url || moduleResponse.body.status === 1)) {
+          res.header(moduleResponse.headers || {}).status(200).send(moduleResponse.body);
+          return;
+        }
+
         // 错误日志
         console.log('[ERR]', decode(req.originalUrl), {
           status: moduleResponse.status,
